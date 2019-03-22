@@ -1,0 +1,41 @@
+version: "3"
+
+networks:
+    app-network:
+        driver: bridge
+
+services:
+    app:
+        image: hello-service-app
+        container_name: hello-service-app
+        depends_on:
+            - redis
+        build:
+            context: .
+            dockerfile: Dockerfile
+        env_file:
+            - .docker.env
+        environment:
+            CONTAINER_ROLE: app
+        volumes:
+            - .:/usr/src/app
+            - node_modules:/usr/src/app/node_modules
+        ports:
+            - 8082:8080
+        networks:
+            - app-network
+    redis:
+        container_name: hello-service-redis
+        image: redis:4-alpine
+        ports:
+            - 63798:6379
+        volumes:
+            - redis:/data
+        networks:
+            - app-network
+
+volumes:
+    node_modules:
+        driver: "local"
+    redis:
+        driver: "local"
